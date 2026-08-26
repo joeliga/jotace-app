@@ -1,17 +1,18 @@
-
 'use client'
 
-
-import { useState, useEffect, use } from 'react'
+import { useState, useEffect } from 'react'
+import { useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 
-export default function DetalleSolicitud({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params)
+export default function DetalleSolicitud() {
+  const params = useParams()
+  const id = params?.id as string
   const [solicitud, setSolicitud] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (!id) return
     const cargarSolicitud = async () => {
       const { data } = await supabase
         .from('solicitudes')
