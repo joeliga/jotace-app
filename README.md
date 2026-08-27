@@ -2,10 +2,6 @@
 
 JOTAC es una plataforma web para la gestión de un centro académico. Permite consultar cursos y recursos bibliográficos, registrarse, iniciar sesión y enviar solicitudes de inscripción.
 
-## Demo en vivo
-
-https://jotace-app.vercel.app
-
 ## Capturas de pantalla
 
 ![Página principal](./public/screenshots/home.png)
@@ -81,3 +77,6 @@ No se deben publicar los valores reales de estas variables.
 **Joel Coro**
 
 GitHub: https://github.com/joeliga
+
+
+Proyecto desplegado y actualizado exitosamente.
