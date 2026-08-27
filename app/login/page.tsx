@@ -31,35 +31,50 @@ export default function Login() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-      <form onSubmit={handleLogin} className="bg-white p-8 rounded-xl border max-w-md w-full shadow-sm space-y-4">
-        <h2 className="text-2xl font-bold text-slate-800 text-center">Iniciar Sesión</h2>
-        {error && <p className="text-red-500 text-sm">{error}</p>}
-        <div>
-          <label className="text-sm font-semibold">Correo Electrónico</label>
-          <input 
-            type="email" 
-            required 
-            value={email} 
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full border p-2 rounded-lg mt-1" 
-          />
+    <main className="flex-1 flex items-center justify-center p-4 mt-12 font-sans">
+      <form onSubmit={handleLogin} className="bg-slate-900 p-8 rounded-2xl border border-slate-800 max-w-md w-full shadow-2xl space-y-6">
+        <h2 className="text-2xl font-bold text-white text-center">Iniciar Sesión</h2>
+        
+        {error && (
+          <div className="p-3 bg-red-900/30 border border-red-800/50 rounded-lg">
+            <p className="text-red-400 text-sm text-center font-medium">{error}</p>
+          </div>
+        )}
+        
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-400 mb-2">Correo Electrónico</label>
+            <input 
+              type="email" 
+              required 
+              value={email} 
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-slate-950 border border-slate-700 text-slate-200 placeholder-slate-600 p-3 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all" 
+              placeholder="tu@correo.com"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-400 mb-2">Contraseña</label>
+            <input 
+              type="password" 
+              required 
+              value={password} 
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-slate-950 border border-slate-700 text-slate-200 placeholder-slate-600 p-3 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all" 
+              placeholder="••••••••"
+            />
+          </div>
         </div>
-        <div>
-          <label className="text-sm font-semibold">Contraseña</label>
-          <input 
-            type="password" 
-            required 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full border p-2 rounded-lg mt-1" 
-          />
-        </div>
-        <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700">
+
+        <button type="submit" className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-lg shadow-blue-900/20 mt-2">
           Ingresar
         </button>
-        <p className="text-xs text-center text-slate-500">
-          ¿No tienes cuenta? <Link href="/register" className="text-blue-600 underline">Regístrate</Link>
+        
+        <p className="text-sm text-center text-slate-400 mt-6">
+          ¿No tienes cuenta?{' '}
+          <Link href="/register" className="text-blue-400 hover:text-blue-300 font-medium transition-colors">
+            Regístrate
+          </Link>
         </p>
       </form>
     </main>

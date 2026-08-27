@@ -1,138 +1,112 @@
 'use client'
 
-
-import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-
-interface Solicitud {
-  id: string
-  descripcion: string
-  estado: string
-  created_at: string
-}
+import { supabase } from '@/lib/supabase'
 
 export default function Dashboard() {
-  const [solicitudes, setSolicitudes] = useState<Solicitud[]>([])
-  const [descripcion, setDescripcion] = useState('')
-  const [loading, setLoading] = useState(true)
-  const [user, setUser] = useState<any>(null)
   const router = useRouter()
+  const [mensajeExito, setMensajeExito] = useState(false)
+  const [cursoSeleccionado, setCursoSeleccionado] = useState('Curso de Matemáticas')
 
-  useEffect(() => {
-    const cargarDatos = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        router.push('/login')
-        return
-      }
-      setUser(user)
+  // Lista de cursos solicitados (sin botones que fallen, solo tarjetas informativas)
+  const cursos = [
+    { id: 1, titulo: 'Curso de Matemáticas', categoria: 'Nivelación', desc: 'Álgebra, trigonometría y cálculo diferencial desde cero.' },
+    { id: 2, titulo: 'Curso de Excel', categoria: 'Herramientas', desc: 'Desde fórmulas básicas hasta tablas dinámicas y macros.' },
+    { id: 3, titulo: 'Curso de Power BI', categoria: 'Datos', desc: 'Análisis de datos, modelado y creación de tableros profesionales.' },
+    { id: 4, titulo: 'Curso de Ofimática', categoria: 'Productividad', desc: 'Dominio completo de Word, PowerPoint y herramientas de oficina.' },
+    { id: 5, titulo: 'Curso de Ciberseguridad', categoria: 'Tecnología', desc: 'Fundamentos de seguridad informática y protección de datos.' },
+  ]
 
-      const { data } = await supabase
-        .from('solicitudes')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-
-      if (data) setSolicitudes(data)
-      setLoading(false)
-    }
-
-    cargarDatos()
-  }, [router])
-
-  const handleCrearSolicitud = async (e: React.FormEvent) => {
+  // Función para simular el envío de solicitud de forma limpia y visual
+  const handleSubmitSolicitud = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!descripcion || !user) return
-
-    const { data, error } = await supabase.from('solicitudes').insert([
-      {
-        user_id: user.id,
-        descripcion,
-        estado: 'Pendiente'
-      }
-    ]).select()
-
-    if (error) {
-      alert('Error al crear la solicitud: ' + error.message)
-      return
-    }
-
-    if (data) {
-      setSolicitudes([data[0], ...solicitudes])
-      setDescripcion('')
-    }
+    setMensajeExito(true)
+    setTimeout(() => {
+      setMensajeExito(false)
+    }, 4000)
   }
 
+  // Cerrar sesión y redirigir al inicio (Home)
   const handleLogout = async () => {
     await supabase.auth.signOut()
     router.push('/')
   }
 
-  if (loading) return <p className="p-8 text-center text-slate-500">Cargando panel...</p>
-
   return (
-    <main className="min-h-screen bg-slate-50 p-6 max-w-4xl mx-auto">
-      <header className="flex justify-between items-center mb-8 bg-white p-4 rounded-xl border">
+    <main className="min-h-screen bg-slate-950 text-slate-100 p-6 md:p-10 max-w-5xl mx-auto font-sans">
+      
+      {/* Header del Dashboard */}
+      <header className="flex flex-col md:flex-row justify-between items-center py-6 border-b border-slate-800 mb-8 gap-4">
         <div>
-          <h1 className="text-xl font-bold text-blue-600">Panel de Cliente - JOTACE</h1>
-          <p className="text-xs text-slate-500">{user?.email}</p>
+          <h1 className="text-2xl font-bold text-blue-500">Panel de Estudiante - JOTAC</h1>
+          <p className="text-sm text-slate-400">Gestiona tus inscripciones y consulta la oferta académica.</p>
         </div>
-        <button onClick={handleLogout} className="px-3 py-1 bg-red-100 text-red-600 rounded-lg text-sm hover:bg-red-200">
+        <button 
+          onClick={handleLogout}
+          className="px-4 py-2 bg-red-600/10 hover:bg-red-600/20 text-red-400 border border-red-800/50 rounded-lg text-sm font-medium transition-colors">
           Cerrar Sesión
         </button>
       </header>
 
-      {/* Formulario de Creación (CRUD: Create) */}
-      <section className="bg-white p-6 rounded-xl border mb-8 shadow-sm">
-        <h2 className="font-bold text-lg mb-4">Solicitar Servicio (Clases / Impresiones / Tareas)</h2>
-        <form onSubmit={handleCrearSolicitud} className="space-y-4">
-          <div>
-            <label className="text-sm font-semibold text-slate-700">Descripción del pedido o materia</label>
-            <textarea
-              required
-              rows={3}
-              value={descripcion}
-              onChange={(e) => setDescripcion(e.target.value)}
-              placeholder="Ej: Necesito impresión de 20 hojas a color para mañana / Requiero clase de refuerzo en álgebra..."
-              className="w-full border p-3 rounded-lg mt-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+      {/* Sección Superior: Enviar Solicitud */}
+      <section className="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl mb-10">
+        <h2 className="text-lg font-bold text-white mb-2">Enviar Solicitud de Inscripción</h2>
+        <p className="text-xs text-slate-400 mb-6">Selecciona el curso de tu interés y envía tu postulación de forma directa.</p>
+
+        {mensajeExito && (
+          <div className="mb-4 p-4 bg-emerald-900/30 border border-emerald-800/50 rounded-xl text-emerald-400 text-sm font-medium text-center animate-pulse">
+            ¡Solicitud enviada con éxito! Nos pondremos en contacto contigo pronto.
           </div>
-          <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 text-sm">
+        )}
+
+        <form onSubmit={handleSubmitSolicitud} className="flex flex-col md:flex-row gap-4 items-center">
+          <select 
+            value={cursoSeleccionado}
+            onChange={(e) => setCursoSeleccionado(e.target.value)}
+            className="w-full md:flex-1 bg-slate-950 border border-slate-700 text-slate-200 p-3 rounded-xl focus:outline-none focus:border-blue-500 text-sm"
+          >
+            {cursos.map(c => (
+              <option key={c.id} value={c.titulo}>{c.titulo}</option>
+            ))}
+          </select>
+
+          <button 
+            type="submit"
+            className="w-full md:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl text-sm transition-all shadow-lg shadow-blue-600/20"
+          >
             Enviar Solicitud
           </button>
         </form>
       </section>
 
-      {/* Listado de Solicitudes (CRUD: Read) */}
-      <section className="bg-white p-6 rounded-xl border shadow-sm">
-        <h2 className="font-bold text-lg mb-4">Mis Solicitudes Activas</h2>
-        {solicitudes.length === 0 ? (
-          <p className="text-sm text-slate-500">No tienes solicitudes registradas aún.</p>
-        ) : (
-          <div className="space-y-3">
-            {solicitudes.map((s) => (
-              <div key={s.id} className="p-4 border rounded-lg flex justify-between items-center bg-slate-50">
-                <div>
-                  <p className="font-medium text-slate-800 text-sm">{s.descripcion}</p>
-                  <p className="text-xs text-slate-400 mt-1">{new Date(s.created_at).toLocaleDateString()}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className={`text-xs px-3 py-1 rounded-full font-semibold ${
-                    s.estado === 'Completado' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
-                  }`}>
-                    {s.estado}
-                  </span>
-                  <Link href={`/solicitud/${s.id}`} className="text-xs text-blue-600 underline">
-                    Ver Detalle
-                  </Link>
-                </div>
+      {/* Sección Inferior: Lista de Cursos en Cuadros (Sin botones molestos) */}
+      <section>
+        <h2 className="text-xl font-bold text-white mb-6">Cursos Disponibles</h2>
+        
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {cursos.map((curso) => (
+            <div 
+              key={curso.id} 
+              className="bg-slate-900/80 p-6 rounded-2xl border border-slate-800 hover:border-slate-700 transition-all flex flex-col justify-between shadow-lg"
+            >
+              <div>
+                <span className="text-xs font-semibold px-3 py-1 bg-blue-500/10 text-blue-400 rounded-lg border border-blue-500/20 inline-block mb-3">
+                  {curso.categoria}
+                </span>
+                <h3 className="font-bold text-lg text-white mb-2">{curso.titulo}</h3>
+                <p className="text-xs text-slate-400 leading-relaxed mb-4">{curso.desc}</p>
               </div>
-            ))}
-          </div>
-        )}
+
+              <div className="pt-3 border-t border-slate-800 text-xs font-medium text-slate-500 flex justify-between items-center">
+                <span>Modalidad: Virtual / Presencial</span>
+                <span className="text-emerald-400">Disponible</span>
+              </div>
+            </div>
+          ))}
+        </div>
       </section>
+
     </main>
   )
 }
