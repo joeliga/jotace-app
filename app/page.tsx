@@ -8,7 +8,7 @@ interface LibroRecurso {
   first_publish_year?: number
 }
 
-// Función para consumir la API pública con async/await desde el servidor (Server Component)
+// Función para consumir la API 
 async function obtenerRecursosAcademicos(): Promise<LibroRecurso[]> {
   try {
     // Usamos la API pública de Open Library buscando libros de matemáticas o educación

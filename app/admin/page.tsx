@@ -1,7 +1,7 @@
-
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 
@@ -16,10 +16,36 @@ interface Solicitud {
 export default function AdminDashboard() {
   const [solicitudes, setSolicitudes] = useState<Solicitud[]>([])
   const [loading, setLoading] = useState(true)
+  const [userRole, setUserRole] = useState<string>('')
+  const router = useRouter()
 
   useEffect(() => {
-    cargarTodasLasSolicitudes()
+    verificarRolYCargar()
   }, [])
+
+  const verificarRolYCargar = async () => {
+    // 1. Obtener la sesión actual
+    const { data: { session } } = await supabase.auth.getSession()
+
+    if (!session) {
+      router.push('/login')
+      return
+    }
+
+    // 2. Extraer el rol guardado en los metadatos del usuario
+    const role = session.user.user_metadata?.role || 'estudiante'
+    setUserRole(role)
+
+    // 3. Validación de permisos: Si NO es admin, redirigir a dashboard de estudiante
+    if (role !== 'admin') {
+      alert('Acceso denegado: Este panel requiere rol de Administrador/Docente.')
+      router.push('/dashboard')
+      return
+    }
+
+    // 4. Si es admin, cargar todas las solicitudes
+    cargarTodasLasSolicitudes()
+  }
 
   const cargarTodasLasSolicitudes = async () => {
     const { data } = await supabase
@@ -31,7 +57,7 @@ export default function AdminDashboard() {
     setLoading(false)
   }
 
-  // Operación CRUD: UPDATE (Actualizar Estado)
+  // Operación CRUD: UPDATE
   const handleCambiarEstado = async (id: string, nuevoEstado: string) => {
     const { error } = await supabase
       .from('solicitudes')
@@ -43,10 +69,9 @@ export default function AdminDashboard() {
     }
   }
 
-  // Operación CRUD: DELETE (Eliminar Solicitud)
+  // Operación CRUD: DELETE
   const handleEliminar = async (id: string) => {
-    const confirmar = confirm('¿Estás seguro de eliminar esta solicitud?')
-    if (!confirmar) return
+    if (!confirm('¿Estás seguro de eliminar esta solicitud?')) return
 
     const { error } = await supabase
       .from('solicitudes')
@@ -58,22 +83,27 @@ export default function AdminDashboard() {
     }
   }
 
-  if (loading) return <p className="p-8 text-center text-slate-500">Cargando panel de administración...</p>
+  if (loading) return <p className="p-8 text-center text-slate-500">Verificando permisos de administrador...</p>
 
   return (
-    <main className="min-h-screen bg-slate-50 p-6 max-w-5xl mx-auto">
+    <main className="min-h-screen bg-slate-50 p-6 max-w-5xl mx-auto font-sans">
       <header className="flex justify-between items-center mb-8 bg-white p-4 rounded-xl border">
         <div>
-          <h1 className="text-xl font-bold text-slate-800">Panel de Administración - JOTACE</h1>
-          <p className="text-xs text-slate-500">Gestión General de Pedidos y Tutorías</p>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-bold text-slate-800">Panel de Administración</h1>
+            <span className="bg-purple-100 text-purple-700 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-purple-300">
+              Rol: {userRole.toUpperCase()}
+            </span>
+          </div>
+          <p className="text-xs text-slate-500">Gestión General de Pedidos y Tutorías (Vista Privada Admin)</p>
         </div>
-        <Link href="/dashboard" className="text-xs text-blue-600 underline">
-          Ir a Vista Cliente
+        <Link href="/dashboard" className="text-xs text-blue-600 underline font-medium">
+          Ir a Vista Estudiante
         </Link>
       </header>
 
       <section className="bg-white p-6 rounded-xl border shadow-sm">
-        <h2 className="font-bold text-lg mb-4">Todas las Solicitudes Recibidas</h2>
+        <h2 className="font-bold text-lg mb-4 text-slate-800">Todas las Solicitudes Recibidas</h2>
         {solicitudes.length === 0 ? (
           <p className="text-sm text-slate-500">No hay solicitudes registradas en el sistema.</p>
         ) : (
@@ -86,7 +116,6 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  {/* Selector de UPDATE de estado */}
                   <select
                     value={s.estado}
                     onChange={(e) => handleCambiarEstado(s.id, e.target.value)}
@@ -97,7 +126,6 @@ export default function AdminDashboard() {
                     <option value="Completado">Completado</option>
                   </select>
 
-                  {/* Botón de DELETE */}
                   <button
                     onClick={() => handleEliminar(s.id)}
                     className="px-3 py-2 bg-red-500 text-white rounded-lg text-xs font-semibold hover:bg-red-600"

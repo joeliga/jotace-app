@@ -8,6 +8,7 @@ import Link from 'next/link'
 export default function Register() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [role, setRole] = useState<'estudiante' | 'admin'>('estudiante') // Estado para el Rol
   const [error, setError] = useState('')
   const [exito, setExito] = useState(false)
   const router = useRouter()
@@ -17,9 +18,15 @@ export default function Register() {
     setError('')
     setExito(false)
 
+    // Guardamos el email, password y el ROL en Supabase Auth
     const { data, error: registerError } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          role: role // Guardamos 'estudiante' o 'admin'
+        }
+      }
     })
 
     if (registerError) {
@@ -30,8 +37,13 @@ export default function Register() {
     if (data.user) {
       setExito(true)
       setTimeout(() => {
-        router.push('/dashboard')
-      }, 2000)
+        // Redirigir según el rol seleccionado
+        if (role === 'admin') {
+          router.push('/admin')
+        } else {
+          router.push('/dashboard')
+        }
+      }, 1500)
     }
   }
 
@@ -41,14 +53,14 @@ export default function Register() {
         <h2 className="text-2xl font-bold text-white text-center">Crear Cuenta</h2>
         
         {error && (
-          <div className="p-3 bg-red-900/30 border border-red-800/50 rounded-xl">
-            <p className="text-red-400 text-sm text-center font-medium">{error}</p>
+          <div className="p-3 bg-red-900/30 border border-red-800/50 rounded-xl text-red-400 text-sm text-center">
+            {error}
           </div>
         )}
 
         {exito && (
-          <div className="p-3 bg-emerald-900/30 border border-emerald-800/50 rounded-xl">
-            <p className="text-emerald-400 text-sm text-center font-medium">¡Cuenta creada con éxito! Redirigiendo...</p>
+          <div className="p-3 bg-emerald-900/30 border border-emerald-800/50 rounded-xl text-emerald-400 text-sm text-center">
+            ¡Cuenta creada con éxito como {role.toUpperCase()}! Redirigiendo...
           </div>
         )}
         
@@ -60,10 +72,11 @@ export default function Register() {
               required 
               value={email} 
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-700 text-slate-200 placeholder-slate-600 p-3 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm" 
+              className="w-full bg-slate-950 border border-slate-700 text-slate-200 p-3 rounded-xl text-sm focus:border-blue-500 focus:outline-none" 
               placeholder="tu@correo.com"
             />
           </div>
+
           <div>
             <label className="block text-sm font-medium text-slate-400 mb-2">Contraseña</label>
             <input 
@@ -71,9 +84,22 @@ export default function Register() {
               required 
               value={password} 
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-700 text-slate-200 placeholder-slate-600 p-3 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm" 
+              className="w-full bg-slate-950 border border-slate-700 text-slate-200 p-3 rounded-xl text-sm focus:border-blue-500 focus:outline-none" 
               placeholder="••••••••"
             />
+          </div>
+
+          {/* SELECTOR DE ROL (REQUISITO EXIGIDO) */}
+          <div>
+            <label className="block text-sm font-medium text-slate-400 mb-2">Tipo de Rol / Usuario</label>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value as 'estudiante' | 'admin')}
+              className="w-full bg-slate-950 border border-slate-700 text-slate-200 p-3 rounded-xl text-sm focus:border-blue-500 focus:outline-none font-medium"
+            >
+              <option value="estudiante">Estudiante / Usuario General</option>
+              <option value="admin">Administrador / Docente</option>
+            </select>
           </div>
         </div>
 
@@ -83,7 +109,7 @@ export default function Register() {
         
         <p className="text-xs text-center text-slate-400 mt-6">
           ¿Ya tienes cuenta?{' '}
-          <Link href="/login" className="text-blue-400 hover:text-blue-300 font-medium transition-colors underline">
+          <Link href="/login" className="text-blue-400 hover:underline">
             Inicia Sesión
           </Link>
         </p>
