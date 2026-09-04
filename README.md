@@ -1,6 +1,15 @@
 # JOTAC - Centro Académico y Plataforma Web
 
-JOTAC es una plataforma web para la gestión de un centro académico. Permite consultar cursos y recursos bibliográficos, registrarse, iniciar sesión y enviar solicitudes de inscripción.
+JOTAC es una plataforma web para la gestión de un centro académico. Permite a los estudiantes consultar cursos, recursos bibliográficos y gestionar solicitudes de inscripción, mientras que los administradores pueden supervisar y gestionar dichos trámites.
+
+## Tecnologías
+
+- Next.js 14 (App Router)
+- TypeScript / JavaScript
+- Tailwind CSS
+- Supabase (PostgreSQL + Auth)
+- Git & GitHub
+- Vercel
 
 ## Capturas de pantalla
 
@@ -10,67 +19,82 @@ JOTAC es una plataforma web para la gestión de un centro académico. Permite co
 
 ![Panel de estudiante](./public/screenshots/dashboard.png)
 
-## Stack tecnológico
-
-* Next.js 14 (App Router)
-* TypeScript / JavaScript
-* Tailwind CSS
-* Supabase (PostgreSQL + Auth)
-* Git y GitHub
-* Vercel
-
 ## Roles de usuario
 
-* **Estudiante / Usuario general:** Puede registrarse, iniciar sesión, consultar cursos y recursos bibliográficos y enviar solicitudes de inscripción.
+### Estudiante
 
-## Modelo de datos
+- Registro e inicio de sesión.
+- Consulta de cursos y recursos.
+- Creación y seguimiento de solicitudes.
 
-La aplicación utiliza **Supabase PostgreSQL** para la gestión de los datos y **Supabase Auth** para la autenticación de usuarios.
+### Administrador
 
-La tabla principal de usuarios es `auth.users`, administrada por Supabase.
+- Acceso al panel `/admin`.
+- Visualización de solicitudes.
+- Actualización de estados.
+- Eliminación de solicitudes.
 
-## Instalación local
+## Rutas principales
 
-```bash
-git clone https://github.com/joeliga/jotace-app.git
-cd jotace-app
-npm install
-npm run dev
-```
+- `/` - Página principal.
+- `/login` - Inicio de sesión.
+- `/register` - Registro.
+- `/dashboard` - Panel del estudiante.
+- `/admin` - Panel administrativo.
+- `/solicitud/[id]` - Detalle de una solicitud.
 
-Abrir en el navegador:
+## Base de datos
 
-http://localhost:3000
+La aplicación utiliza PostgreSQL mediante Supabase.
 
-## Variables de entorno
+La tabla `solicitudes` contiene:
 
-Crear un archivo `.env.local` en la raíz del proyecto:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=tu_url_de_supabase
-NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_clave_de_supabase
-```
-
-No se deben publicar los valores reales de estas variables.
-
-## Credenciales de prueba
-
-* **Usuario:** [docente_prueba@jotac.com](mailto:docente_prueba@jotac.com)
-* **Contraseña:** Password123*
+- `id` - Identificador único.
+- `nombre` - Nombre de la solicitud.
+- `descripcion` - Descripción.
+- `estado` - Pendiente, En proceso o Completado.
+- `created_at` - Fecha de creación.
+- `user_id` - Usuario relacionado.
 
 ## Funcionalidades
 
-* [x] Página principal
-* [x] Consumo de API externa
-* [x] Registro e inicio de sesión
-* [x] Autenticación con Supabase
-* [x] Protección de rutas privadas
-* [x] Dashboard de estudiante
-* [x] Consulta de cursos
-* [x] Solicitud de inscripción
-* [x] Recursos bibliográficos
-* [x] Diseño responsive
-* [x] Despliegue en Vercel
+- [x] Autenticación con Supabase Auth.
+- [x] Control de acceso basado en roles (RBAC).
+- [x] Protección de rutas privadas.
+- [x] Dashboard de estudiantes.
+- [x] Panel administrativo.
+- [x] Operaciones CRUD.
+- [x] Consulta de cursos y recursos bibliográficos.
+- [x] Ruta dinámica de solicitudes.
+- [x] Diseño responsive.
+- [x] Despliegue en Vercel.
+
+## Instalación
+
+Clonar el repositorio:
+
+    git clone https://github.com/joeliga/jotace-app.git
+
+Acceder al proyecto:
+
+    cd jotace-app
+
+Instalar las dependencias:
+
+    npm install
+
+Ejecutar el proyecto:
+
+    npm run dev
+
+Crear un archivo `.env.local` en la raíz del proyecto:
+
+    NEXT_PUBLIC_SUPABASE_URL=tu_url_de_supabase
+    NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_clave_de_supabase
+
+Abrir en el navegador:
+
+    http://localhost:3000
 
 ## Autor
 
@@ -78,5 +102,4 @@ No se deben publicar los valores reales de estas variables.
 
 GitHub: https://github.com/joeliga
 
-
-Proyecto desplegado y actualizado exitosamente.
+Repositorio: https://github.com/joeliga/jotace-app
