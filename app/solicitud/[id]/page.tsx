@@ -40,7 +40,7 @@ export default function DetalleSolicitud() {
         <div className="flex justify-between items-center border-b pb-4">
           <h1 className="font-bold text-xl text-slate-800">Detalle de Solicitud</h1>
           <span className="text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 font-semibold">
-            {solicitud.estado}
+            {solicitud.estado || 'Pendiente'}
           </span>
         </div>
 
@@ -51,8 +51,15 @@ export default function DetalleSolicitud() {
 
         <div>
           <h2 className="text-xs font-semibold text-slate-400 uppercase">Detalle del Requerimiento</h2>
-          <p className="text-slate-800 mt-1">{solicitud.descripcion}</p>
+          <p className="text-slate-800 mt-1">{solicitud.descripcion || solicitud.nombre || 'Sin descripción'}</p>
         </div>
+
+        {solicitud.carrera && (
+          <div>
+            <h2 className="text-xs font-semibold text-slate-400 uppercase">Carrera</h2>
+            <p className="text-sm text-slate-600 mt-1">{solicitud.carrera}</p>
+          </div>
+        )}
 
         <div>
           <h2 className="text-xs font-semibold text-slate-400 uppercase">Fecha de Registro</h2>
